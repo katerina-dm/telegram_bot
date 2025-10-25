@@ -5,10 +5,13 @@ import asyncio
 from config import BOT_TOKEN # импортируем из файла config
 from hundlers import register_handlers
 from scheduler import start_sheduler
-
+from db import init_db
 
 
 async def main():
+    print("Инициализируем базу данных")
+    await init_db
+
     start_sheduler()
     print("Фоновые задачи запущены")
 
