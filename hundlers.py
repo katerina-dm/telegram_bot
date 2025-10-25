@@ -24,6 +24,7 @@ async def register_handlers(dp: Dispatcher):
     dp.message.register(feed_pet,F.text == BTN_FEED)
     dp.message.register(slip_pet,F.text == BTN_SLLEP)
     dp.message.register(status_pet, F.text ==  BTN_STATUS)
+    dp.callback_query.register(food_callbeck_handler, lambda c: c.data.startswith("feed_")) #перехватчик кнопок кормления
 
 
 
@@ -105,4 +106,33 @@ async def status_pet(message: types.Message):
     )
     await message.answer(status)
 
+async def food_callbeck_handler(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    if user_id not in pets:
+        await callback.message.edit_text("Сначала запусти бота с помощью команды /start")
+        return
+    
+    pet = pets[user_id]
+    food = callback.data
+    message = ""
+    h = pet["hunger"]
 
+    if food == "feed_Ice cream":
+        h = pet["hunger"] + 20
+        message = f"Вы покормили {pet['name']} вкусной мороженкой "
+    
+    elif food == "feed_Shrimp":
+        h = pet["hunger"] + 15
+        message = f"Вы покормили {pet['name']} запеченной креветкой"
+    
+    elif food == "feed_drink":
+        h = pet["hunger"] + 5
+        message = f"Вы дали {pet['name']} попить воды"
+    
+    pet["hunger"] = min(100, h)
+
+    await callback.message.edit_text(message)
+    await callback.answer(
+        f"Сытость {pet['name']} -- {pet["hunger"]}/100"
+        f"{progress_bar(pet["hunger"], 10)}"
+        )
