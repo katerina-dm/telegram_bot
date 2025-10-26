@@ -10,7 +10,7 @@ from db import init_db
 
 async def main():
     print("Инициализируем базу данных")
-    await init_db
+    await init_db()
 
     start_sheduler()
     print("Фоновые задачи запущены")
